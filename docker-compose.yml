@@ -31,7 +31,7 @@ services:
 
   # ---------- PGADMIN ---------- #
   pgadmin:
-    image: dpage/pgadmin4:8.7
+    image: dpage/pgadmin4:6.21
     hostname: pgadmin
     container_name: pgadmin
     networks: ['demo']
@@ -43,7 +43,6 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-admin}
       - PGADMIN_CONFIG_SERVER_MODE=False
       - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
-      - SCRIPT_NAME=/pgadmin
       - PGADMIN_CONFIG_UPGRADE_CHECK_ENABLED=False
       - PGADMIN_CONFIG_CONSOLE_LOG_LEVEL=20
     volumes:

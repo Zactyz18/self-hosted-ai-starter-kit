@@ -6,7 +6,7 @@
         "mode": "insert",
         "qdrantCollection": {
           "__rl": true,
-          "value": "=documentsnew",
+          "value": "=documentsmeta",
           "mode": "id"
         },
         "options": {}
@@ -48,7 +48,16 @@
     },
     {
       "parameters": {
-        "options": {}
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file_id",
+                "value": "={{ $('Update Status').item.json.file_id }}"
+              }
+            ]
+          }
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
       "typeVersion": 1,
@@ -62,14 +71,14 @@
     {
       "parameters": {
         "content": "## Ingestion WITH Context\n\n",
-        "height": 780,
-        "width": 2220,
+        "height": 1420,
+        "width": 3920,
         "color": 4
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -880,
-        -500
+        -1580,
+        -1080
       ],
       "typeVersion": 1,
       "id": "cb5d0ddd-ee23-4842-aa97-065c021d679f",
@@ -1104,7 +1113,7 @@
   },
   "active": true,
   "settings": {},
-  "versionId": "8f32e6ad-e790-430f-a80f-f5d98adb5c9a",
+  "versionId": "32591042-28a3-482a-86af-84827867fb90",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "f07f836cac22cad92e5e5eaae0fd8126a9218c771c9e8519790581de3bb2e0e0"

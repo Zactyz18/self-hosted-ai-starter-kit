@@ -93,9 +93,9 @@
         "toolDescription": "work with you data in qdrant vector store",
         "qdrantCollection": {
           "__rl": true,
-          "value": "documentsnew",
+          "value": "documentsmeta",
           "mode": "list",
-          "cachedResultName": "documentsnew"
+          "cachedResultName": "documentsmeta"
         },
         "topK": 5,
         "options": {}
@@ -201,7 +201,7 @@
   },
   "active": true,
   "settings": {},
-  "versionId": "ff2f196f-bfe9-40ac-bef6-f1ce3a6f5662",
+  "versionId": "6d1304d6-de9d-456a-91b2-a01830e52c28",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "f07f836cac22cad92e5e5eaae0fd8126a9218c771c9e8519790581de3bb2e0e0"

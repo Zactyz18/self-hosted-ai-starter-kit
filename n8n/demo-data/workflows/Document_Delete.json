@@ -154,7 +154,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        1060,
+        1280,
         -400
       ],
       "id": "delete-from-db",
@@ -175,7 +175,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        1260,
+        1480,
         -400
       ],
       "id": "success-response",
@@ -231,11 +231,38 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        620,
+        460,
         -520
       ],
       "id": "ab119c1d-8b04-4be7-bf77-3adebe649caf",
       "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://qdrant:6333/collections/documentsmeta/points/delete",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"filter\": {\n    \"must\": [\n      {\n        \"key\": \"metadata.file_id\",\n        \"match\": {\n          \"value\": \"{{ $('Check Document Exists').item.json.file_id }}\"\n        }\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        -520
+      ],
+      "id": "193b2158-e59b-4d6c-8aed-7fc30ed61f10",
+      "name": "Remove Points"
     }
   ],
   "pinData": {},
@@ -324,6 +351,17 @@
       "main": [
         [
           {
+            "node": "Remove Points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Points": {
+      "main": [
+        [
+          {
             "node": "Delete from Database",
             "type": "main",
             "index": 0
@@ -334,7 +372,7 @@
   },
   "active": true,
   "settings": {},
-  "versionId": "cc02c331-09c8-42d5-8b5f-4ceef7ddaff7",
+  "versionId": "69b0aee5-acdf-42c5-97ee-b4b135b15099",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "f07f836cac22cad92e5e5eaae0fd8126a9218c771c9e8519790581de3bb2e0e0"
