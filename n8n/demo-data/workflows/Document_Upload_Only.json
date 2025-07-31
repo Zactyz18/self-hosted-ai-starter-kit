@@ -1,0 +1,303 @@
+{
+  "name": "Document Upload Only",
+  "nodes": [
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"message\": \"Document uploaded successfully. Processing will begin automatically.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -400
+      ],
+      "id": "upload-success-response",
+      "name": "Upload Success Response"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/app/uploads/{{ $json.file_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        -560
+      ],
+      "id": "79e8114e-86b9-46f7-8b00-8da78ff90716",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_size": "={{ $json.fileSize }}",
+            "file_id": "={{ $json.file_id }}",
+            "file_name": "={{ $json.fileName }}",
+            "file_type": "={{ $json.fileType }}",
+            "file_path": "={{ $json.fileName }}",
+            "created_at": "={{ new Date().toISOString() }}",
+            "updated_at": "={{ new Date().toISOString() }}",
+            "processing_status": "uploaded",
+            "upload_time": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "file_type",
+              "displayName": "file_type",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "file_size",
+              "displayName": "file_size",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "file_path",
+              "displayName": "file_path",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "upload_time",
+              "displayName": "upload_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing_status",
+              "displayName": "processing_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "chunks_created",
+              "displayName": "chunks_created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "vector_count",
+              "displayName": "vector_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "error_message",
+              "displayName": "error_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -40,
+        -580
+      ],
+      "id": "77fc427c-927b-44ba-a1d1-987e753ab380",
+      "name": "Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "z49ainMq5BXxCiVz",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "upload-document",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        -560
+      ],
+      "id": "8710e61f-58eb-4ea7-8c63-4b18315ffbca",
+      "name": "Upload Document Webhook1",
+      "webhookId": "document-upload-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileData = $binary.data;\n\n// Generate unique file ID using timestamp + filename + size\nconst fileName = fileData.fileName || 'unnamed-file';\nconst fileType = fileData.fileType || fileData.mimeType || 'unknown';\n\n// Try different ways to get the file size\nlet fileSize = 0;\nif (fileData.data && fileData.data.length) {\n  fileSize = fileData.data.length;\n} else if (fileData.buffer && fileData.buffer.length) {\n  fileSize = fileData.buffer.length;\n} else if (fileData instanceof Buffer) {\n  fileSize = fileData.length;\n} else if (fileData.fileSize) {\n  // Fallback to parsing the string\n  const match = fileData.fileSize.match(/^([\\d.]+)\\s*([KMGT]?B)$/i);\n  if (match) {\n    const value = parseFloat(match[1]);\n    const unit = match[2].toUpperCase();\n    switch(unit) {\n      case 'B': fileSize = Math.round(value); break;\n      case 'KB': fileSize = Math.round(value * 1024); break;\n      case 'MB': fileSize = Math.round(value * 1024 * 1024); break;\n      case 'GB': fileSize = Math.round(value * 1024 * 1024 * 1024); break;\n      default: fileSize = Math.round(value);\n    }\n  }\n}\n\nconst timestamp = Date.now();\n\n// Create a simple unique ID using timestamp and file info\nconst fileId = `${timestamp}_${fileSize}_${fileName.replace(/[^a-zA-Z0-9]/g, '_')}`;\n\nreturn {\n  json: {\n    file_id: fileId,\n    fileName: fileName,\n    fileType: fileType,\n    fileSize: fileSize,\n    uploadTime: new Date().toISOString()\n  },\n  binary: $binary\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        -560
+      ],
+      "id": "eddc3b19-8e5d-4ba9-973a-9661a109a5f0",
+      "name": "Generate File ID1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Document Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Generate File ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate File ID1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Upload Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "21dd005b-c68f-4664-b436-569233949ee9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f07f836cac22cad92e5e5eaae0fd8126a9218c771c9e8519790581de3bb2e0e0"
+  },
+  "id": "iWrTKVBrBUIWqHJ1",
+  "tags": []
+}

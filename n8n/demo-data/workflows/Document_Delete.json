@@ -1,0 +1,344 @@
+{
+  "name": "Document Delete",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "delete-document",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        -400
+      ],
+      "id": "webhook-delete",
+      "name": "Delete Document Webhook",
+      "webhookId": "document-delete-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "file-id-exists",
+              "leftValue": "={{ $json.body.file_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -400
+      ],
+      "id": "check-file-id",
+      "name": "Check File ID"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "file_id",
+              "value": "={{ $json.body.file_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -200,
+        -400
+      ],
+      "id": "get-document-info",
+      "name": "Get Document Info",
+      "credentials": {
+        "postgres": {
+          "id": "z49ainMq5BXxCiVz",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "document-exists",
+              "leftValue": "={{ $json.file_path }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -400
+      ],
+      "id": "check-document-exists",
+      "name": "Check Document Exists"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "file_id",
+              "value": "={{ $('Check Document Exists').item.json.file_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1060,
+        -400
+      ],
+      "id": "delete-from-db",
+      "name": "Delete from Database",
+      "credentials": {
+        "postgres": {
+          "id": "z49ainMq5BXxCiVz",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"message\": \"Document deleted successfully\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        -400
+      ],
+      "id": "success-response",
+      "name": "Success Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"error\": \"File ID is required\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -200
+      ],
+      "id": "error-missing-id",
+      "name": "Error - Missing ID"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"error\": \"Document not found\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -200
+      ],
+      "id": "error-not-found",
+      "name": "Error - Not Found"
+    },
+    {
+      "parameters": {
+        "jsCode": "const filePath = items[0].json.file_path;\n\nlet command;\nif (filePath.match(/^[a-zA-Z]:\\\\/)) {\n  // Windows style path\n  command = `del \"${filePath}\"`;\n} else {\n  // Unix style path\n  command = `rm \"${filePath}\"`;\n}\n\nreturn [{ json: { command } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        -500
+      ],
+      "id": "6d8feb94-e5d4-4611-9f1b-8773d48084e1",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.command }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -520
+      ],
+      "id": "ab119c1d-8b04-4be7-bf77-3adebe649caf",
+      "name": "Execute Command"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Delete Document Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check File ID": {
+      "main": [
+        [
+          {
+            "node": "Get Document Info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error - Missing ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Document Info": {
+      "main": [
+        [
+          {
+            "node": "Check Document Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Document Exists": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error - Not Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete from Database": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Delete from Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "cc02c331-09c8-42d5-8b5f-4ceef7ddaff7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f07f836cac22cad92e5e5eaae0fd8126a9218c771c9e8519790581de3bb2e0e0"
+  },
+  "id": "DocumentDeleteWorkflow",
+  "tags": []
+}

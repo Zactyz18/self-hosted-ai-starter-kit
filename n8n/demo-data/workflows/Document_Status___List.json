@@ -1,0 +1,100 @@
+{
+  "name": "Document Status & List",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "document-status",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        -400
+      ],
+      "id": "webhook-status",
+      "name": "Document Status Webhook",
+      "webhookId": "document-status-webhook"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        -400,
+        -400
+      ],
+      "id": "get-documents-from-db",
+      "name": "Get Documents from DB",
+      "credentials": {
+        "postgres": {
+          "id": "z49ainMq5BXxCiVz",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [
+        -180,
+        -400
+      ],
+      "id": "0fbcf447-1505-4f1b-97b1-85821f666dd8",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Document Status Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Documents from DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Documents from DB": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "5aeb90d7-5e4a-4fd5-a2d9-e37d1cc13f4b",
+  "meta": {
+    "instanceId": "f07f836cac22cad92e5e5eaae0fd8126a9218c771c9e8519790581de3bb2e0e0"
+  },
+  "id": "H9Nos8eHAxH3foOh",
+  "tags": []
+}
