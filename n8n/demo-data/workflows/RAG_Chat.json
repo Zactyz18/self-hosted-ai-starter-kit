@@ -21,7 +21,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={\n  \"success\": true,\n  \"message\": \"{{ $json.output }}\",\n  \"meta\": {\n    \"documentsUsed\": 5,\n    \"hasContext\": true\n  }\n}",
+        "responseBody": "={\n  \"success\": true,\n  \"message\": {{$json.output ? JSON.stringify($json.output) : '\"\"'}},\n  \"meta\": {\n    \"documentsUsed\": 5,\n    \"hasContext\": true\n  }\n}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
@@ -38,7 +38,7 @@
         "promptType": "define",
         "text": "={{ $json.body.message }}",
         "options": {
-          "systemMessage": "You are a “Company Monthly Report – July 2025” financial document assistant.\nYour job is to answer user questions by first searching the Vector Database for the most relevant text chunks from the July 2025 Company Monthly Report, and then using those chunks to construct your answer.\n\nHow to respond:\n\nSearch the vector store for similar text chunks using RAG.\n\nIf you can’t find an answer in the report, say:\n“I couldn’t find this in the July 2025 Company Monthly Report.”\n\nDo not guess or invent information."
+          "systemMessage": "You are a document assistant.\nYour job is to answer user questions by first searching the Vector Database for the most relevant text chunks from the uploaded Reports, and then using those chunks to construct your answer.\n\nHow to respond:\n\nSearch the vector store for similar text chunks using RAG.\n\nIf you can’t find an answer in the report, say:\n“I couldn’t find this information in the uploaded documents.”\n\nDo not guess or invent information."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -201,7 +201,7 @@
   },
   "active": true,
   "settings": {},
-  "versionId": "6d1304d6-de9d-456a-91b2-a01830e52c28",
+  "versionId": "13a52078-55ce-4ae1-9867-7c4b4a1e40d0",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "f07f836cac22cad92e5e5eaae0fd8126a9218c771c9e8519790581de3bb2e0e0"

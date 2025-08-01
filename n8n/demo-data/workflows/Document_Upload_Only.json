@@ -49,8 +49,8 @@
           "value": {
             "file_size": "={{ $json.fileSize }}",
             "file_id": "={{ $json.file_id }}",
-            "file_name": "={{ $json.fileName }}",
-            "file_type": "={{ $json.fileType }}",
+            "file_name": "={{ $binary.data.fileName }}",
+            "file_type": "={{ $json.fileExtension }}",
             "file_path": "={{ $json.fileName }}",
             "created_at": "={{ new Date().toISOString() }}",
             "updated_at": "={{ new Date().toISOString() }}",
@@ -232,7 +232,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const fileData = $binary.data;\n\n// Generate unique file ID using timestamp + filename + size\nconst fileName = fileData.fileName || 'unnamed-file';\nconst fileType = fileData.fileType || fileData.mimeType || 'unknown';\n\n// Try different ways to get the file size\nlet fileSize = 0;\nif (fileData.data && fileData.data.length) {\n  fileSize = fileData.data.length;\n} else if (fileData.buffer && fileData.buffer.length) {\n  fileSize = fileData.buffer.length;\n} else if (fileData instanceof Buffer) {\n  fileSize = fileData.length;\n} else if (fileData.fileSize) {\n  // Fallback to parsing the string\n  const match = fileData.fileSize.match(/^([\\d.]+)\\s*([KMGT]?B)$/i);\n  if (match) {\n    const value = parseFloat(match[1]);\n    const unit = match[2].toUpperCase();\n    switch(unit) {\n      case 'B': fileSize = Math.round(value); break;\n      case 'KB': fileSize = Math.round(value * 1024); break;\n      case 'MB': fileSize = Math.round(value * 1024 * 1024); break;\n      case 'GB': fileSize = Math.round(value * 1024 * 1024 * 1024); break;\n      default: fileSize = Math.round(value);\n    }\n  }\n}\n\nconst timestamp = Date.now();\n\n// Create a simple unique ID using timestamp and file info\nconst fileId = `${timestamp}_${fileSize}_${fileName.replace(/[^a-zA-Z0-9]/g, '_')}`;\n\nreturn {\n  json: {\n    file_id: fileId,\n    fileName: fileName,\n    fileType: fileType,\n    fileSize: fileSize,\n    uploadTime: new Date().toISOString()\n  },\n  binary: $binary\n};"
+        "jsCode": "const fileData = $binary.data;\n\n// Generate unique file ID using timestamp + filename + size\nconst fileName = fileData.fileName || 'unnamed-file';\nconst fileType = fileData.fileType || fileData.mimeType || 'unknown';\n\n// Try different ways to get the file size\nlet fileSize = 0;\nif (fileData.data && fileData.data.length) {\n  fileSize = fileData.data.length;\n} else if (fileData.buffer && fileData.buffer.length) {\n  fileSize = fileData.buffer.length;\n} else if (fileData instanceof Buffer) {\n  fileSize = fileData.length;\n} else if (fileData.fileSize) {\n  // Fallback to parsing the string\n  const match = fileData.fileSize.match(/^([\\d.]+)\\s*([KMGT]?B)$/i);\n  if (match) {\n    const value = parseFloat(match[1]);\n    const unit = match[2].toUpperCase();\n    switch(unit) {\n      case 'B': fileSize = Math.round(value); break;\n      case 'KB': fileSize = Math.round(value * 1024); break;\n      case 'MB': fileSize = Math.round(value * 1024 * 1024); break;\n      case 'GB': fileSize = Math.round(value * 1024 * 1024 * 1024); break;\n      default: fileSize = Math.round(value);\n    }\n  }\n}\n\n// Extract file extension\nconst fileExtension = fileName.split('.').pop();\n\n// Generate a unique file ID\nconst timestamp = Date.now();\nconst fileId = `${timestamp}_${fileSize}_${fileName.replace(/[^a-zA-Z0-9]/g, '_')}`;\n\nreturn {\n  json: {\n    file_id: fileId,\n    fileName: fileName,\n    fileType: fileType,\n    fileSize: fileSize,\n    fileExtension: fileExtension,\n    uploadTime: new Date().toISOString()\n  },\n  binary: $binary\n};\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -293,7 +293,7 @@
   },
   "active": true,
   "settings": {},
-  "versionId": "21dd005b-c68f-4664-b436-569233949ee9",
+  "versionId": "8ebacfbf-b4cc-4677-8720-f48518f43f89",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "f07f836cac22cad92e5e5eaae0fd8126a9218c771c9e8519790581de3bb2e0e0"

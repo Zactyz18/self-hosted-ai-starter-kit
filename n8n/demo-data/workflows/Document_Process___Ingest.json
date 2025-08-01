@@ -87,14 +87,14 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "={\n  \"data\": {{ JSON.stringify($json.data) }}\n}\n",
+        "jsonOutput": "={\n  \"data\": {{ JSON.stringify($json.text) }}\n}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        280,
-        -420
+        320,
+        -300
       ],
       "id": "d1ad0e57-1170-4a3a-aa0e-6a291eb374a3",
       "name": "Document Data"
@@ -102,6 +102,7 @@
     {
       "parameters": {
         "operation": "text",
+        "destinationKey": "text",
         "options": {}
       },
       "type": "n8n-nodes-base.extractFromFile",
@@ -127,8 +128,8 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $binary.data.fileType }}",
-                    "rightValue": "text",
+                    "leftValue": "={{ $json.fileExtension }}",
+                    "rightValue": "txt",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -152,7 +153,7 @@
                 "conditions": [
                   {
                     "id": "fd4f2f67-aa57-4467-b34a-9f2f9e496423",
-                    "leftValue": "={{ $binary.data.fileType }}",
+                    "leftValue": "={{ $json.fileExtension }}",
                     "rightValue": "pdf",
                     "operator": {
                       "type": "string",
@@ -177,7 +178,7 @@
                 "conditions": [
                   {
                     "id": "a8d72e67-9485-4aba-ba52-ec5895354221",
-                    "leftValue": "={{ $binary.data.fileType }}",
+                    "leftValue": "={{ $json.fileExtension }}",
                     "rightValue": "docx",
                     "operator": {
                       "type": "string",
@@ -225,8 +226,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        440,
-        -420
+        420,
+        -700
       ],
       "id": "67cfdd7b-2bd8-47f9-ab68-8c14686fa4d8",
       "name": "Recursive  Splitter"
@@ -239,8 +240,8 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        600,
-        -420
+        560,
+        -680
       ],
       "id": "38319baa-87ae-4d7f-9345-d95abfb02422",
       "name": "Split Out"
@@ -258,8 +259,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        860,
-        -140
+        820,
+        -500
       ],
       "id": "614a09d6-3c02-4ae0-9668-19367445dc0f",
       "name": "OpenAI Chat Model1",
@@ -287,8 +288,8 @@
       "type": "n8n-nodes-base.summarize",
       "typeVersion": 1.1,
       "position": [
-        1180,
-        -420
+        1080,
+        -720
       ],
       "id": "ea3a7908-623c-4e9c-81a6-2d378ce005c9",
       "name": "Summarize"
@@ -301,8 +302,8 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.6,
       "position": [
-        820,
-        -420
+        740,
+        -700
       ],
       "id": "4885db35-ec3d-4331-a636-47e438952e89",
       "name": "Add Context"
@@ -418,7 +419,9 @@
     {
       "parameters": {
         "fileSelector": "={{ $('Postgres').item.json.file_path }}",
-        "options": {}
+        "options": {
+          "fileExtension": "={{ $json.file_type }}"
+        }
       },
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
@@ -871,6 +874,47 @@
           "name": "Postgres account"
         }
       }
+    },
+    {
+      "parameters": {
+        "chunkSize": 500,
+        "chunkOverlap": 50,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1720,
+        -20
+      ],
+      "id": "ca8f2318-5504-49ac-b143-f81e9db9bf59",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "content": "## Optional add context",
+        "height": 440,
+        "width": 900
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        380,
+        -780
+      ],
+      "typeVersion": 1,
+      "id": "6372207c-8c14-4225-a19d-9e0e8b58cd0e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-docx-converter.docxToText",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -80
+      ],
+      "id": "c1afe321-2634-4344-9f28-d4a5657849c3",
+      "name": "DOCX to Text"
     }
   ],
   "pinData": {},
@@ -912,7 +956,7 @@
       "main": [
         [
           {
-            "node": "Recursive  Splitter",
+            "node": "Qdrant Vector Store2",
             "type": "main",
             "index": 0
           }
@@ -948,7 +992,7 @@
         ],
         [
           {
-            "node": "Extract from File",
+            "node": "DOCX to Text",
             "type": "main",
             "index": 0
           }
@@ -1023,13 +1067,7 @@
     },
     "Character Text Splitter": {
       "ai_textSplitter": [
-        [
-          {
-            "node": "Default Data Loader1",
-            "type": "ai_textSplitter",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Every 30 Seconds": {
@@ -1109,11 +1147,33 @@
           }
         ]
       ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DOCX to Text": {
+      "main": [
+        [
+          {
+            "node": "Document Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {},
-  "versionId": "32591042-28a3-482a-86af-84827867fb90",
+  "versionId": "1c17a235-f55a-4a99-864a-594b18d52b87",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "f07f836cac22cad92e5e5eaae0fd8126a9218c771c9e8519790581de3bb2e0e0"
